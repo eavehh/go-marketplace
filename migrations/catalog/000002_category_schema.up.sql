@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS categories(
+    id UUID PRIMARY KEY NOT NULL,
+    title VARCHAR(200) NOT NULL
+);
+
+  INSERT INTO categories(id, title)
+  VALUES('c0000001-0000-0000-0000-000000000001','test category')
+  ON CONFLICT DO NOTHING;

@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS brand(
+    id UUID PRIMARY KEY NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    image_url TEXT
+);
+
+  INSERT INTO brand(id, title)
+  VALUES('b0000001-0000-0000-0000-000000000001', 'test brand')
+  ON CONFLICT DO NOTHING;
