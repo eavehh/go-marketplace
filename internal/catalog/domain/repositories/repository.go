@@ -7,13 +7,13 @@ import (
 )
 
 type Catalog_item_repo interface {
-	Item(ctx context.Context) ([]entity.Catalog_item, error)
+	Items(ctx context.Context) ([]entity.Catalog_item, error)
 }
 
 type Brand_repo interface {
-	Brand(ctx context.Context) ([]entity.Brand, error)
+	Brands(ctx context.Context) ([]entity.Brand, error)
 }
 
 type Category_repo interface {
-	Category(ctx context.Context) ([]entity.Category, error)
+	Categories(ctx context.Context) ([]entity.Category, error)
 }
