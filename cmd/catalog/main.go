@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"database/sql"
 	_ "database/sql"
@@ -12,18 +13,22 @@ import (
 	"github.com/eavehh/marketpl.microserv/internal/catalog/application/queries"
 	"github.com/eavehh/marketpl.microserv/internal/catalog/infrastructure/persistence"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	const (
-		pg_host  = "localhost"
-		app_port = "9101"
-		pg_user  = "postgres"
-		pg_pass  = "12345678"
-		pg_db    = "catalog_db_dev"
-		pg_ssl   = "disable"
-	)
+
+	if err := godotenv.Load("../../.env"); err != nil {
+		log.Println(".env file doesnt exist ", err)
+	}
+
+	pg_host := os.Getenv("localhost")
+	app_port := os.Getenv("9101")
+	pg_user := os.Getenv("postgres")
+	pg_pass := os.Getenv("12345678")
+	pg_db := os.Getenv("catalog_db_dev")
+	pg_ssl := os.Getenv("disable")
 
 	dsn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
