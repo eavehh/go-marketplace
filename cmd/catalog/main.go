@@ -19,20 +19,20 @@ import (
 
 func main() {
 
-	if err := godotenv.Load("../../.env"); err != nil {
-		log.Println(".env file doesnt exist ", err)
+	if err := godotenv.Load(".env"); err != nil {
+		log.Println(".env file does not exis:", err)
 	}
 
-	pg_host := os.Getenv("localhost")
-	app_port := os.Getenv("9101")
-	pg_user := os.Getenv("postgres")
-	pg_pass := os.Getenv("12345678")
-	pg_db := os.Getenv("catalog_db_dev")
-	pg_ssl := os.Getenv("disable")
+	pg_host := os.Getenv("CATALOG_PG_HOST")
+	pg_port := os.Getenv("CATALOG_PG_PORT")
+	pg_user := os.Getenv("CATALOG_PG_USER")
+	pg_pass := os.Getenv("CATALOG_PG_PASS")
+	pg_db := os.Getenv("CATALOG_PG_DB")
+	pg_ssl := os.Getenv("CATALOG_PG_SSL")
 
 	dsn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		pg_host, app_port, pg_user, pg_pass, pg_db, pg_ssl,
+		pg_host, pg_port, pg_user, pg_pass, pg_db, pg_ssl,
 	)
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
