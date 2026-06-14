@@ -51,14 +51,22 @@ func main() {
 	})
 
 	brands_repo := persistence.New_brand_repo(db)
-	brands_query_handler := queries.New_brands_queries(brands_repo)
-	brands_api_handler := handlers.New_brands_handler(brands_query_handler)
-
 	categories_repo := persistence.New_Category_repo(db)
-	categories_query_handler := queries.New_categories_query(categories_repo)
-	categories_handler := handlers.New_categories_handler(categories_query_handler)
+	items_repo := persistence.New_item_repository(db)
 
-	api.Register_routes(engine, brands_api_handler, categories_handler)
+	list_brands := queries.New_brands_queries(brands_repo)
+	list_categories := queries.New_categories_queries(categories_repo)
+	list_items := queries.New_Item_queries(items_repo)
+
+	brands_handler := handlers.New_brands_handler(list_brands)
+	categories_handler := handlers.New_categories_handler(list_categories)
+	items_handler := handlers.New_catalog_items_handler(list_items)
+
+	api.Register_routes(engine,
+		brands_handler,
+		categories_handler,
+		items_handler,
+	)
 
 	if err := engine.Run(":9001"); err != nil {
 		log.Fatal(err.Error())

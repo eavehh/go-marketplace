@@ -8,9 +8,11 @@ import (
 func Register_routes(r *gin.Engine,
 	brands *handlers.Brands_handler,
 	categories *handlers.Categories_handler,
+	items *handlers.Catalog_items_handler,
 ) {
 	v1 := r.Group("/api/v1")
 
 	v1.GET("/brands", brands.Brands)
-	v1.GET("categories", categories.Categories)
+	v1.GET("/categories", categories.Categories)
+	v1.GET("/catalog-items", items.Items)
 }
