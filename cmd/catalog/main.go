@@ -54,7 +54,11 @@ func main() {
 	brands_query_handler := queries.New_brands_queries(brands_repo)
 	brands_api_handler := handlers.New_brands_handler(brands_query_handler)
 
-	api.Register_routes(engine, brands_api_handler)
+	categories_repo := persistence.New_Category_repo(db)
+	categories_query_handler := queries.New_categories_query(categories_repo)
+	categories_handler := handlers.New_categories_handler(categories_query_handler)
+
+	api.Register_routes(engine, brands_api_handler, categories_handler)
 
 	if err := engine.Run(":9001"); err != nil {
 		log.Fatal(err.Error())

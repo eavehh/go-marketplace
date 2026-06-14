@@ -4,5 +4,22 @@ CREATE TABLE IF NOT EXISTS categories(
 );
 
   INSERT INTO categories(id, title)
-  VALUES('c0000001-0000-0000-0000-000000000001','test category')
+  VALUES('c0000001-0000-0000-0000-000000000001','test1 category')
   ON CONFLICT DO NOTHING;
+
+    INSERT INTO categories(id, title)
+  VALUES('c0000001-0000-0000-0000-000000000002','test2 category')
+  ON CONFLICT DO NOTHING;
+
+    INSERT INTO categories(id, title)
+  VALUES('c0000001-0000-0000-0000-000000000003','test3 category')
+  ON CONFLICT DO NOTHING;
+
+    INSERT INTO categories(id, title)
+  VALUES('c0000001-0000-0000-0000-000000000004','test4 category')
+  ON CONFLICT DO NOTHING;
+
+    INSERT INTO categories(id, title)
+  VALUES('c0000001-0000-0000-0000-000000000005','test5 category')
+  ON CONFLICT DO NOTHING;
+  
