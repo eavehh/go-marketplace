@@ -9,16 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type item_repository struct {
-	db *sql.DB
-}
-
-func New_item_repository(db *sql.DB) *item_repository {
-	return &item_repository{db: db}
-}
-
-func (r *item_repository) Items(ctx context.Context) ([]entity.Catalog_item, error) {
-	query := `
+const catalog_items_query = `
 	SELECT
 	ci.id,
 	ci.title,
@@ -35,6 +26,17 @@ func (r *item_repository) Items(ctx context.Context) ([]entity.Catalog_item, err
 	LEFT JOIN categories ctg ON ci.category_id = ctg.id
 	`
 
+type item_repository struct {
+	db *sql.DB
+}
+
+func New_item_repository(db *sql.DB) *item_repository {
+	return &item_repository{db: db}
+}
+
+func (r *item_repository) Items(ctx context.Context) ([]entity.Catalog_item, error) {
+	query := catalog_items_query
+
 	rows, err := r.db.QueryContext(ctx, query)
 
 	if err != nil {
@@ -45,24 +47,33 @@ func (r *item_repository) Items(ctx context.Context) ([]entity.Catalog_item, err
 
 	var items []entity.Catalog_item
 	for rows.Next() {
-		item, err := scan_ci(rows)
+		item, err := scan_catalog_item(rows)
 
 		if err != nil {
 			return nil, fmt.Errorf("scan catalog item: %w", err)
 		}
-		items = append(items, item)
+		items = append(items, *item)
 	}
-	return items, rows.Err()
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("items iteration: %w", err)
+	}
+
+	return items, nil
 }
 
-func scan_ci(rows *sql.Rows) (entity.Catalog_item, error) {
-	var item entity.Catalog_item
+type scanner interface {
+	Scan(dest ...any) error
+}
+
+func scan_catalog_item(scanner_rows scanner) (*entity.Catalog_item, error) {
+	var item *entity.Catalog_item = &entity.Catalog_item{}
 	var brand_id *uuid.UUID
 	var brand_title *string
 	var category_id *uuid.UUID
 	var category_title *string
 
-	err := rows.Scan(
+	err := scanner_rows.Scan(
 		&item.Id,
 		&item.Title,
 		&item.Short_description,
@@ -76,7 +87,7 @@ func scan_ci(rows *sql.Rows) (entity.Catalog_item, error) {
 	)
 
 	if err != nil {
-		return item, err
+		return item, fmt.Errorf("scan catalog item: %w", err)
 	}
 
 	if brand_id != nil {
