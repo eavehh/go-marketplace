@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const catalog_items_query = `
+const sql_catalog_items_query = `
 	SELECT
 	ci.id,
 	ci.title,
@@ -35,7 +35,7 @@ func New_item_repository(db *sql.DB) *item_repository {
 }
 
 func (r *item_repository) Items(ctx context.Context) ([]entity.Catalog_item, error) {
-	query := catalog_items_query
+	query := sql_catalog_items_query
 
 	rows, err := r.db.QueryContext(ctx, query)
 
@@ -60,6 +60,17 @@ func (r *item_repository) Items(ctx context.Context) ([]entity.Catalog_item, err
 	}
 
 	return items, nil
+}
+
+func (r *item_repository) Item(ctx context.Context, id uuid.UUID) (*entity.Catalog_item, error) {
+	query := sql_catalog_items_query + " WHERE ci.id = $1"
+	row := r.db.QueryRowContext(ctx, query, id)
+	item, err := scan_catalog_item(row)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	return item, nil
 }
 
 type scanner interface {

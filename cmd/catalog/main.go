@@ -54,9 +54,9 @@ func main() {
 	categories_repo := persistence.New_Category_repo(db)
 	items_repo := persistence.New_item_repository(db)
 
-	list_brands := queries.New_brands_queries(brands_repo)
-	list_categories := queries.New_categories_queries(categories_repo)
-	list_items := queries.New_Item_queries(items_repo)
+	list_brands := queries.New_brands_handler(brands_repo)
+	list_categories := queries.New_categories_handler(categories_repo)
+	list_items := queries.New_catalog_items_handler(items_repo)
 
 	brands_handler := handlers.New_brands_handler(list_brands)
 	categories_handler := handlers.New_categories_handler(list_categories)

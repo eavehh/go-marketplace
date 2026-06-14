@@ -7,15 +7,15 @@ import (
 	"github.com/eavehh/marketpl.microserv/internal/catalog/domain/repositories"
 )
 
-type Item_query_handler struct {
+type Catalog_items_handler struct {
 	repo repositories.Catalog_item_repo
 }
 
-func New_Item_queries(repo repositories.Catalog_item_repo) *Item_query_handler {
-	return &Item_query_handler{repo: repo}
+func New_catalog_items_handler(repo repositories.Catalog_item_repo) *Catalog_items_handler {
+	return &Catalog_items_handler{repo: repo}
 }
 
-func (q *Item_query_handler) Handle(ctx context.Context) (
+func (q *Catalog_items_handler) Handle(ctx context.Context) (
 	[]entity.Catalog_item, error) {
 	return q.repo.Items(ctx)
 }

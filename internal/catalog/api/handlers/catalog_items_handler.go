@@ -8,10 +8,10 @@ import (
 )
 
 type Catalog_items_handler struct {
-	catalog_items *queries.Item_query_handler
+	catalog_items *queries.Catalog_items_handler
 }
 
-func New_catalog_items_handler(Items *queries.Item_query_handler) *Catalog_items_handler {
+func New_catalog_items_handler(Items *queries.Catalog_items_handler) *Catalog_items_handler {
 	return &Catalog_items_handler{catalog_items: Items}
 }
 

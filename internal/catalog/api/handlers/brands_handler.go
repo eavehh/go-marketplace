@@ -8,10 +8,10 @@ import (
 )
 
 type Brands_handler struct {
-	brands *queries.Brands_query_handler
+	brands *queries.Brands_handler
 }
 
-func New_brands_handler(brands *queries.Brands_query_handler) *Brands_handler {
+func New_brands_handler(brands *queries.Brands_handler) *Brands_handler {
 	return &Brands_handler{brands: brands}
 }
 

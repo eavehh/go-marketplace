@@ -8,10 +8,10 @@ import (
 )
 
 type Categories_handler struct {
-	categories *queries.Categories_query_handler
+	categories *queries.Categories_handler
 }
 
-func New_categories_handler(categories *queries.Categories_query_handler) *Categories_handler {
+func New_categories_handler(categories *queries.Categories_handler) *Categories_handler {
 	return &Categories_handler{categories: categories}
 }
 
