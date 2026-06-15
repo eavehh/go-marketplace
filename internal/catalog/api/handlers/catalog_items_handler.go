@@ -12,15 +12,18 @@ import (
 type Catalog_items_handler struct {
 	catalog_items *queries.Catalog_items_handler
 	item_by_id    *queries.Catalog_item_by_id_handler
+	item_by_title *queries.Catalog_item_by_title_handler
 }
 
 func New_catalog_items_handler(
 	items *queries.Catalog_items_handler,
 	item_by_id *queries.Catalog_item_by_id_handler,
+	item_by_title *queries.Catalog_item_by_title_handler,
 ) *Catalog_items_handler {
 	return &Catalog_items_handler{
 		catalog_items: items,
 		item_by_id:    item_by_id,
+		item_by_title: item_by_title,
 	}
 }
 
@@ -49,6 +52,29 @@ func (h *Catalog_items_handler) Item_by_id(c *gin.Context) {
 	}
 
 	item, err := h.item_by_id.Handle(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if item == nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "catalog item not found",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"result": item,
+	})
+}
+
+func (h *Catalog_items_handler) Item_by_title(c *gin.Context) {
+	title := c.Param("title")
+
+	item, err := h.item_by_title.Handle(c.Request.Context(), title)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),

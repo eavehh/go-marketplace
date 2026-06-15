@@ -98,7 +98,7 @@ func (r *item_repository) Item_by_title(ctx context.Context, title string) ([]en
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("items iteration: %w", err)
+		return nil, fmt.Errorf("items by title iteration: %w", err)
 	}
 	// я бы добавил логирование включая название файла или класса
 	return items, nil

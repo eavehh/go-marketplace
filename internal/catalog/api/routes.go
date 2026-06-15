@@ -16,4 +16,5 @@ func Register_routes(r *gin.Engine,
 	v1.GET("/categories", categories.Categories)
 	v1.GET("/catalog-items", items.Items)
 	v1.GET("/catalog-items/:id", items.Item_by_id)
+	v1.GET("/catalog-items/:title", items.Item_by_title)
 }
