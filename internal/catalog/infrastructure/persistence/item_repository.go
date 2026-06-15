@@ -77,7 +77,7 @@ func (r *item_repository) Item(ctx context.Context, id uuid.UUID) (*entity.Catal
 }
 
 func (r *item_repository) Item_by_title(ctx context.Context, title string) ([]entity.Catalog_item, error) {
-	query := sql_catalog_items_query + `WHERE ci.title ILIKE '%' $1 '%'`
+	query := sql_catalog_items_query + `WHERE ci.title ILIKE '%' || $1 || '%'`
 
 	rows, err := r.db.QueryContext(ctx, query, title)
 
@@ -87,7 +87,7 @@ func (r *item_repository) Item_by_title(ctx context.Context, title string) ([]en
 
 	defer rows.Close()
 
-	var items []entity.Catalog_item
+	var items []entity.Catalog_item = []entity.Catalog_item{}
 	for rows.Next() {
 		item, err := scan_catalog_item(rows)
 

@@ -82,13 +82,6 @@ func (h *Catalog_items_handler) Item_by_title(c *gin.Context) {
 		return
 	}
 
-	if item == nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "catalog item not found",
-		})
-		return
-	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"result": item,
 	})
