@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/eavehh/marketpl.microserv/internal/catalog/domain/entity"
@@ -65,9 +66,11 @@ func (r *item_repository) Items(ctx context.Context) ([]entity.Catalog_item, err
 func (r *item_repository) Item(ctx context.Context, id uuid.UUID) (*entity.Catalog_item, error) {
 	query := sql_catalog_items_query + " WHERE ci.id = $1"
 	row := r.db.QueryRowContext(ctx, query, id)
+
 	item, err := scan_catalog_item(row)
 
-	if err == sql.ErrNoRows {
+	// errors.Is решает проблему обертки внутри err из-за которой err не может равняться sql.ErrNoRows (я завернул ее в фугкции scan_catalog_item)
+	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}
 	return item, nil
@@ -98,7 +101,7 @@ func scan_catalog_item(scanner_rows scanner) (*entity.Catalog_item, error) {
 	)
 
 	if err != nil {
-		return item, fmt.Errorf("scan catalog item: %w", err)
+		return item, fmt.Errorf("scan catalog item: %w", err) // будет продлема со сравнением ошилки из-заобертки
 	}
 
 	if brand_id != nil {

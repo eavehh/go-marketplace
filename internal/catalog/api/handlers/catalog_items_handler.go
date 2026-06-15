@@ -57,7 +57,7 @@ func (h *Catalog_items_handler) Item_by_id(c *gin.Context) {
 	}
 
 	if item == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
+		c.JSON(http.StatusNotFound, gin.H{
 			"error": "catalog item not found",
 		})
 		return

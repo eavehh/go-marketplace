@@ -57,10 +57,14 @@ func main() {
 	list_brands := queries.New_brands_handler(brands_repo)
 	list_categories := queries.New_categories_handler(categories_repo)
 	list_items := queries.New_catalog_items_handler(items_repo)
+	item_by_id := queries.New_catalog_item_by_id_handler(items_repo)
 
 	brands_handler := handlers.New_brands_handler(list_brands)
 	categories_handler := handlers.New_categories_handler(list_categories)
-	items_handler := handlers.New_catalog_items_handler(list_items)
+	items_handler := handlers.New_catalog_items_handler(
+		list_items,
+		item_by_id,
+	)
 
 	api.Register_routes(engine,
 		brands_handler,
