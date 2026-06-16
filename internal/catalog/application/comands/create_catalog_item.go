@@ -1,4 +1,4 @@
-package comands
+package commands
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type Create_catalog_item_command struct {
+type Create_catalog_item_command_model struct {
 	Title             string
 	Short_description string
 	Full_description  string
@@ -26,7 +26,7 @@ func New_create_catalog_item_handler(repo repositories.Catalog_item_repo) *Creat
 	return &Create_catalog_item_handler{repo: repo}
 }
 func (h *Create_catalog_item_handler) Handle(ctx context.Context,
-	cmd Create_catalog_item_command) (uuid.UUID, error) {
+	cmd Create_catalog_item_command_model) (uuid.UUID, error) {
 	item := entity.Catalog_item{
 		Base_entity: entity.Base_entity{
 			Id:    uuid.New(),

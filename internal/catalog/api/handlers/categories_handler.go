@@ -21,6 +21,7 @@ func (h *Categories_handler) Categories(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
+		return
 	}
 
 	c.JSON(
