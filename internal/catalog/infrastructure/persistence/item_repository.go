@@ -188,6 +188,17 @@ func (r *item_repository) Update(ctx context.Context, item entity.Catalog_item) 
 	return n > 0, nil
 }
 
+func (r *item_repository) Delete(ctx context.Context, id uuid.UUID) (bool, error) {
+	sql_delete_query := `DELETE FROM catalog_items WHERE id = $1`
+	result, err := r.db.Exec(sql_delete_query, id)
+
+	if err != nil {
+		return false, fmt.Errorf("delete item[%v], error:%w", id, err)
+	}
+	n, _ := result.RowsAffected()
+	return n > 0, nil
+}
+
 type scanner interface {
 	Scan(dest ...any) error
 }

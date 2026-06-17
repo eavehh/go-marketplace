@@ -17,6 +17,7 @@ type Catalog_items_handler struct {
 
 	create_item *commands.Create_catalog_item_handler
 	update_item *commands.Update_catalog_item_handler
+	delete_item *commands.Delete_catalog_item_handler
 }
 
 func New_catalog_items_handler(
@@ -25,6 +26,7 @@ func New_catalog_items_handler(
 	item_by_title *queries.Catalog_item_by_title_handler,
 	create_item *commands.Create_catalog_item_handler,
 	update_item *commands.Update_catalog_item_handler,
+	delete_item *commands.Delete_catalog_item_handler,
 
 ) *Catalog_items_handler {
 	return &Catalog_items_handler{
@@ -33,6 +35,7 @@ func New_catalog_items_handler(
 		item_by_title: item_by_title,
 		create_item:   create_item,
 		update_item:   update_item,
+		delete_item:   delete_item,
 	}
 }
 
@@ -136,6 +139,29 @@ func (h *Catalog_items_handler) Update_item(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"is_success": updated,
+	})
+
+}
+
+func (h *Catalog_items_handler) Delete_item(c *gin.Context) {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid id",
+		})
+		return
+	}
+
+	success, err := h.delete_item.Handle(c, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"is_success": success,
 	})
 
 }
