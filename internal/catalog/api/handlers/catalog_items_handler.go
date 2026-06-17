@@ -95,7 +95,7 @@ func (h *Catalog_items_handler) Item_by_title(c *gin.Context) {
 
 func (h *Catalog_items_handler) Create_item(c *gin.Context) {
 	var cmd_model commands.Create_catalog_item_command_model
-	if err := c.ShouldBindJSON(cmd_model); err != nil {
+	if err := c.ShouldBindJSON(&cmd_model); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})

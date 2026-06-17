@@ -111,7 +111,7 @@ func (r *item_repository) Create(ctx context.Context, item entity.Catalog_item) 
 
 	var brand_id, category_id uuid.UUID
 	if item.Brand != nil {
-		category_id = item.Brand.Id
+		brand_id = item.Brand.Id
 	}
 	if item.Category != nil {
 		category_id = item.Category.Id
@@ -128,7 +128,7 @@ func (r *item_repository) Create(ctx context.Context, item entity.Catalog_item) 
     brand_id,
     category_id
     )
-	VALUES(1$ ,2$ ,3$ ,4$ ,5$ ,6$ ,7$ ,8$);`
+	VALUES($1, $2, $3, $4, $5, $6, $7, $8);`
 
 	_, err := r.db.Exec(sql_create_query,
 		item.Id,

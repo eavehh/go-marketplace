@@ -9,13 +9,13 @@ import (
 )
 
 type Create_catalog_item_command_model struct {
-	Title             string
-	Short_description string
-	Full_description  string
-	Image_url         string
-	Price             float64
-	Brand             entity.Brand
-	Category          entity.Category
+	Title             string          `json:"title"`
+	Short_description string          `json:"short_description"`
+	Full_description  string          `json:"full_description"`
+	Image_url         string          `json:"image_url"`
+	Price             float64         `json:"price"`
+	Brand             entity.Brand    `json:"brand"`
+	Category          entity.Category `json:"category"`
 }
 
 type Create_catalog_item_handler struct {
