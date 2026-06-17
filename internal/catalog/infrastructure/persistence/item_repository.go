@@ -159,7 +159,7 @@ func (r *item_repository) Update(ctx context.Context, item entity.Catalog_item) 
 	}
 
 	sql_update_query := `
-	UPDATE catslog_items SET
+	UPDATE catalog_items SET
     title = $1,
     short_description = $2,
     full_description = $3,

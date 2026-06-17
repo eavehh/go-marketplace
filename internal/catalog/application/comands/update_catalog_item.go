@@ -8,7 +8,8 @@ import (
 	"github.com/google/uuid"
 )
 
-type Create_catalog_item_command_model struct {
+type Update_catalog_item_command_model struct {
+	Id                *uuid.UUID      `json:"id"`
 	Title             string          `json:"title"`
 	Short_description string          `json:"short_description"`
 	Full_description  string          `json:"full_description"`
@@ -18,18 +19,26 @@ type Create_catalog_item_command_model struct {
 	Category          entity.Category `json:"category"`
 }
 
-type Create_catalog_item_handler struct {
+type Update_catalog_item_handler struct {
 	repo repositories.Catalog_item_repo
 }
 
-func New_create_catalog_item_handler(repo repositories.Catalog_item_repo) *Create_catalog_item_handler {
-	return &Create_catalog_item_handler{repo: repo}
+func New_update_catalog_item_handler(repo repositories.Catalog_item_repo) *Update_catalog_item_handler {
+	return &Update_catalog_item_handler{repo: repo}
 }
-func (h *Create_catalog_item_handler) Handle(ctx context.Context,
-	cmd Create_catalog_item_command_model) (uuid.UUID, error) {
+func (h *Update_catalog_item_handler) Handle(ctx context.Context,
+	cmd Update_catalog_item_command_model) (bool, error) {
+	exist, err := h.repo.Item(ctx, *cmd.Id)
+	if err != nil {
+		return false, err
+	}
+	if exist == nil {
+		return false, nil
+	}
+
 	item := entity.Catalog_item{
 		Base_entity: entity.Base_entity{
-			Id:    uuid.New(),
+			Id:    *cmd.Id,
 			Title: cmd.Title,
 		},
 		Short_description: &cmd.Short_description,
@@ -40,10 +49,10 @@ func (h *Create_catalog_item_handler) Handle(ctx context.Context,
 		Category:          &cmd.Category,
 	}
 
-	created, err := h.repo.Create(ctx, item)
+	updated, err := h.repo.Update(ctx, item)
 	if err != nil {
-		return uuid.Nil, err
+		return updated, err
 	}
 
-	return created.Id, nil
+	return updated, nil
 }

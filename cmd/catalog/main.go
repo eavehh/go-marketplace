@@ -61,6 +61,7 @@ func main() {
 	item_by_id := queries.New_catalog_item_by_id_handler(items_repo)
 	item_by_title := queries.New_catalog_item_by_title_handler(items_repo)
 	create_item := commands.New_create_catalog_item_handler(items_repo)
+	update_item := commands.New_update_catalog_item_handler(items_repo)
 
 	brands_handler := handlers.New_brands_handler(list_brands)
 	categories_handler := handlers.New_categories_handler(list_categories)
@@ -69,6 +70,7 @@ func main() {
 		item_by_id,
 		item_by_title,
 		create_item,
+		update_item,
 	)
 
 	api.Register_routes(engine,

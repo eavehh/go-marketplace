@@ -19,4 +19,6 @@ func Register_routes(r *gin.Engine,
 	v1.GET("/catalog-items/title/:title", items.Item_by_title)
 
 	v1.POST("/catalog-items", items.Create_item)
+
+	v1.PUT("/catalog-items", items.Update_item)
 }
