@@ -12,6 +12,7 @@ type Catalog_item_repo interface {
 	Item(ctx context.Context, id uuid.UUID) (*entity.Catalog_item, error)
 	Item_by_title(ctx context.Context, title string) ([]entity.Catalog_item, error)
 	Create(ctx context.Context, item entity.Catalog_item) (entity.Catalog_item, error)
+	Update(ctx context.Context, item entity.Catalog_item) (bool, error)
 }
 
 type Brand_repo interface {

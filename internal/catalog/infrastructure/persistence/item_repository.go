@@ -148,6 +148,46 @@ func (r *item_repository) Create(ctx context.Context, item entity.Catalog_item) 
 	return item, nil
 }
 
+func (r *item_repository) Update(ctx context.Context, item entity.Catalog_item) (bool, error) {
+	var brand_id, category_id *uuid.UUID
+
+	if item.Brand != nil {
+		brand_id = &item.Brand.Id
+	}
+	if item.Category != nil {
+		category_id = &item.Category.Id
+	}
+
+	sql_update_query := `
+	UPDATE catslog_items SET
+    title = $1,
+    short_description = $2,
+    full_description = $3,
+    image_url = $4,
+    price = $5,
+    brand_id = $6,
+    category_id = $7
+	WHERE id = $8`
+
+	result, err := r.db.ExecContext(ctx, sql_update_query,
+		item.Title,
+		item.Short_description,
+		item.Full_description,
+		item.Image_url,
+		item.Price,
+		brand_id,
+		category_id,
+		item.Id,
+	)
+
+	if err != nil {
+		return false, fmt.Errorf("update item: item[%v], error: %w", item.Id, err)
+	}
+
+	n, _ := result.RowsAffected()
+	return n > 0, nil
+}
+
 type scanner interface {
 	Scan(dest ...any) error
 }
