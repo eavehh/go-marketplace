@@ -60,6 +60,7 @@ func main() {
 	list_items := queries.New_catalog_items_handler(items_repo)
 	item_by_id := queries.New_catalog_item_by_id_handler(items_repo)
 	item_by_title := queries.New_catalog_item_by_title_handler(items_repo)
+	item_by_brand_title := queries.New_catalog_item_by_brand_title_handler(items_repo)
 	create_item := commands.New_create_catalog_item_handler(items_repo)
 	update_item := commands.New_update_catalog_item_handler(items_repo)
 	delete_item := commands.New_delete_catalog_item_handler(items_repo)
@@ -70,6 +71,7 @@ func main() {
 		list_items,
 		item_by_id,
 		item_by_title,
+		item_by_brand_title,
 		create_item,
 		update_item,
 		delete_item,

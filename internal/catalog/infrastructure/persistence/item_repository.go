@@ -199,6 +199,35 @@ func (r *item_repository) Delete(ctx context.Context, id uuid.UUID) (bool, error
 	return n > 0, nil
 }
 
+func (r *item_repository) Item_by_brand_title(ctx context.Context, brand_title string) ([]entity.Catalog_item, error) {
+	query := sql_catalog_items_query + `WHERE brnd.title ILIKE '%' || $1 || '%'`
+
+	rows, err := r.db.QueryContext(ctx, query, brand_title)
+
+	if err != nil {
+		return nil, fmt.Errorf("item by brand title query: %w", err)
+	}
+
+	defer rows.Close()
+
+	var items []entity.Catalog_item = []entity.Catalog_item{}
+	for rows.Next() {
+		item, err := scan_catalog_item(rows)
+
+		if err != nil {
+			return nil, fmt.Errorf("scan catalog item by brand: %w", err)
+		}
+		items = append(items, *item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("items by brand iteration: %w", err)
+	}
+	// я бы добавил логирование включая название файла или класса
+	return items, nil
+
+}
+
 type scanner interface {
 	Scan(dest ...any) error
 }
@@ -224,8 +253,9 @@ func scan_catalog_item(scanner_rows scanner) (*entity.Catalog_item, error) {
 	)
 
 	if err != nil {
-		return item, fmt.Errorf("scan catalog item: %w", err) // будет продлема со сравнением ошилки из-заобертки
+		return item, fmt.Errorf("scan catalog item: %w", err)
 	}
+	// будет продлема со сравнением ошилки из-заобертки
 
 	if brand_id != nil {
 		item.Brand = &entity.Brand{

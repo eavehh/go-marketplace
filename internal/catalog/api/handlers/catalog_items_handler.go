@@ -11,9 +11,10 @@ import (
 )
 
 type Catalog_items_handler struct {
-	catalog_items *queries.Catalog_items_handler
-	item_by_id    *queries.Catalog_item_by_id_handler
-	item_by_title *queries.Catalog_item_by_title_handler
+	catalog_items       *queries.Catalog_items_handler
+	item_by_id          *queries.Catalog_item_by_id_handler
+	item_by_title       *queries.Catalog_item_by_title_handler
+	item_by_brand_title *queries.Catalog_item_by_brand_title_handler
 
 	create_item *commands.Create_catalog_item_handler
 	update_item *commands.Update_catalog_item_handler
@@ -24,18 +25,21 @@ func New_catalog_items_handler(
 	items *queries.Catalog_items_handler,
 	item_by_id *queries.Catalog_item_by_id_handler,
 	item_by_title *queries.Catalog_item_by_title_handler,
+	item_by_brand_title *queries.Catalog_item_by_brand_title_handler,
 	create_item *commands.Create_catalog_item_handler,
 	update_item *commands.Update_catalog_item_handler,
 	delete_item *commands.Delete_catalog_item_handler,
 
 ) *Catalog_items_handler {
 	return &Catalog_items_handler{
-		catalog_items: items,
-		item_by_id:    item_by_id,
-		item_by_title: item_by_title,
-		create_item:   create_item,
-		update_item:   update_item,
-		delete_item:   delete_item,
+		catalog_items:       items,
+		item_by_id:          item_by_id,
+		item_by_title:       item_by_title,
+		item_by_brand_title: item_by_brand_title,
+
+		create_item: create_item,
+		update_item: update_item,
+		delete_item: delete_item,
 	}
 }
 
@@ -86,7 +90,7 @@ func (h *Catalog_items_handler) Item_by_id(c *gin.Context) {
 func (h *Catalog_items_handler) Item_by_title(c *gin.Context) {
 	title := c.Param("title")
 
-	item, err := h.item_by_title.Handle(c.Request.Context(), title)
+	items, err := h.item_by_title.Handle(c.Request.Context(), title)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -95,8 +99,25 @@ func (h *Catalog_items_handler) Item_by_title(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"result": item,
+		"result": items,
 	})
+}
+
+func (h *Catalog_items_handler) Item_by_brand_title(c *gin.Context) {
+	brand_title := c.Param("brand")
+
+	items, err := h.item_by_brand_title.Handle(c, brand_title)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"result": items,
+	})
+
 }
 
 func (h *Catalog_items_handler) Create_item(c *gin.Context) {
