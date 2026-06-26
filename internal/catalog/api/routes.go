@@ -20,8 +20,6 @@ func Register_routes(r *gin.Engine,
 	v1.GET("/catalog-items/brand/:brand", items.Item_by_brand_title)
 
 	v1.POST("/catalog-items", items.Create_item)
-
 	v1.PUT("/catalog-items", items.Update_item)
-
 	v1.DELETE("/catalog-items/:id", items.Delete_item)
 }

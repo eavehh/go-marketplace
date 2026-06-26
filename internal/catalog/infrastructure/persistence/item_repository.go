@@ -5,8 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/eavehh/marketpl.microserv/internal/catalog/domain/entity"
+	"github.com/eavehh/marketpl.microserv/internal/catalog/domain/spec"
 	"github.com/google/uuid"
 )
 
@@ -228,6 +230,129 @@ func (r *item_repository) Item_by_brand_title(ctx context.Context, brand_title s
 
 }
 
+func (r *item_repository) Catalog_items(ctx context.Context, args spec.Query_args) (spec.Pagination[entity.Catalog_item], error) {
+	args.Normalize()
+
+	sql_base_form := `
+	FROM catalog_items ci
+	LEFT JOIN brands b ON ci.brand_id = b.id
+	LEFT JOIN categories c ON ci.category_id = c.id
+	`
+	var condition []string
+	var params []any
+	param_idx := 1
+
+	category_id, err := args.Parse_category_id()
+	if err != nil {
+		return spec.Pagination[entity.Catalog_item]{},
+			fmt.Errorf("invalid category id: %v", err)
+	}
+	brand_id, err := args.Parse_brand_id()
+	if err != nil {
+		return spec.Pagination[entity.Catalog_item]{},
+			fmt.Errorf("invalid brand id: %v", err)
+	}
+
+	if brand_id != nil {
+		condition = append(condition, fmt.Sprintf("ci.brand_id = $%d", param_idx))
+		params = append(params, brand_id)
+		param_idx += 1
+	}
+	if category_id != nil {
+		condition = append(condition, fmt.Sprintf("ci.category_id = $%d", param_idx))
+		params = append(params, category_id)
+		param_idx += 1
+	}
+
+	if args.Search != nil && *args.Search != "" {
+		condition = append(condition, fmt.Sprintf(
+			"ci.title ILIKE '%%' || $%d || '%%'", param_idx))
+		params = append(params, &args.Search)
+		param_idx += 1
+	}
+
+	where_clause := ""
+	if len(condition) > 0 {
+		where_clause = "WHERE" + strings.Join(condition, "AND")
+	}
+
+	/* QueryRowContext используется когда ожидаешь ровно одну строку.
+	count(*) всегда возвращает одну строку с одним числом. .Scan(&total_count)
+	читает это число в переменную. params... — распаковка слайса
+	в variadic-аргументы (как params[0], params[1], ...) */
+
+	count_query := "SELECT count(*)" + sql_base_form + where_clause
+	fmt.Println("|DEV LOG| count_query; file item_repository.go; func Catalog_items calls sql query: ", count_query)
+	var total_count int // нужна для того чтобы знать сколько параметров вернется в строке после QueryRowContext
+	err = r.db.QueryRowContext(ctx, count_query, params...).Scan(&total_count)
+	if err != nil {
+		return spec.Pagination[entity.Catalog_item]{}, err
+	}
+	// count_query нужен для того чтобы дать понять клиенту сколько всего items он получит по этим фильтрам
+
+	order_clause := ""
+	if args.Sort != nil {
+		switch strings.ToLower(*args.Sort) {
+		case "price_asc":
+			order_clause = "ORDER BY ci.price ASC"
+		case "title_desc":
+			order_clause = "ORDER BY ci.price DESC"
+		case "title_asc":
+			order_clause = "ORDER BY ci.title ASC"
+		case "price_desc":
+			order_clause = "ORDER BY ci.title DESC"
+		}
+		// направление (ascending = по возрастанию)
+	}
+	offset := (args.Page_index - 1) * args.Page_size
+	pagination_clause := fmt.Sprintf("LIMIT $%d OFFSET $%d", param_idx, param_idx+1)
+	pagination_params := append(params, args.Page_size, offset)
+
+	sql_select_fields := `
+	SELECT
+	ci.id,
+	ci.title,
+	ci.short_description,     
+	ci.full_description,
+	ci.image_url,     
+	ci.price,
+	brnd.id,
+	brnd.title,
+	ctg.id,
+	ctg.title
+	`
+
+	sql_full_query := sql_select_fields + sql_base_form + where_clause + order_clause + pagination_clause
+
+	fmt.Println("|DEV LOG| sql_full_query; file item_repository.go; func Catalog_items calls sql query: ", sql_full_query)
+
+	rows, err := r.db.QueryContext(ctx, sql_full_query, pagination_params...)
+
+	if err != nil {
+		return spec.Pagination[entity.Catalog_item]{}, err
+	}
+	defer rows.Close()
+
+	var items []entity.Catalog_item = []entity.Catalog_item{}
+	for rows.Next() {
+		item, err := scan_catalog_item(rows)
+		if err != nil {
+			return spec.Pagination[entity.Catalog_item]{}, err
+		}
+		items = append(items, *item)
+	}
+	if err != nil {
+		return spec.Pagination[entity.Catalog_item]{}, err
+
+	}
+	return spec.Pagination[entity.Catalog_item]{
+		Page_index:  args.Page_index,
+		Page_size:   args.Page_size,
+		Total_count: total_count,
+		Items:       items,
+	}, nil
+}
+
 type scanner interface {
 	Scan(dest ...any) error
 }
@@ -255,7 +380,7 @@ func scan_catalog_item(scanner_rows scanner) (*entity.Catalog_item, error) {
 	if err != nil {
 		return item, fmt.Errorf("scan catalog item: %w", err)
 	}
-	// будет продлема со сравнением ошилки из-заобертки
+	// будет продлема со сравнением ошилки из-за обертки
 
 	if brand_id != nil {
 		item.Brand = &entity.Brand{

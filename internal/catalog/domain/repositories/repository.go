@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/eavehh/marketpl.microserv/internal/catalog/domain/entity"
+	"github.com/eavehh/marketpl.microserv/internal/catalog/domain/spec"
 	"github.com/google/uuid"
 )
 
@@ -15,6 +16,7 @@ type Catalog_item_repo interface {
 	Create(ctx context.Context, item entity.Catalog_item) (entity.Catalog_item, error)
 	Update(ctx context.Context, item entity.Catalog_item) (bool, error)
 	Delete(ctx context.Context, id uuid.UUID) (bool, error)
+	Catalog_items(ctx context.Context, args spec.Query_args) (spec.Pagination[entity.Catalog_item], error)
 }
 
 type Brand_repo interface {
