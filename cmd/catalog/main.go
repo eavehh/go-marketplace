@@ -64,6 +64,7 @@ func main() {
 	create_item := commands.New_create_catalog_item_handler(items_repo)
 	update_item := commands.New_update_catalog_item_handler(items_repo)
 	delete_item := commands.New_delete_catalog_item_handler(items_repo)
+	catalog_items_v2 := queries.New_catalog_items_v2_handler(items_repo)
 
 	brands_handler := handlers.New_brands_handler(list_brands)
 	categories_handler := handlers.New_categories_handler(list_categories)
@@ -76,11 +77,13 @@ func main() {
 		update_item,
 		delete_item,
 	)
+	items_handler_v2 := handlers.New_catalog_items_handler_v2(catalog_items_v2)
 
 	api.Register_routes(engine,
 		brands_handler,
 		categories_handler,
 		items_handler,
+		items_handler_v2,
 	)
 
 	if err := engine.Run(":9001"); err != nil {

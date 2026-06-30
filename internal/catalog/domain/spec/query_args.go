@@ -5,12 +5,12 @@ import "github.com/google/uuid"
 const Max_page_size = 4
 
 type Query_args struct {
-	Page_index  int     `form"page_index"`
-	Page_size   int     `form"page_size"`
-	Brand_id    *string `form"brand_id"`
-	Category_id *string `form"category_id"`
-	Search      *string `form"search"`
-	Sort        *string `form"sort"`
+	Page_index  int     `form:"page_index"`
+	Page_size   int     `form:"page_size"`
+	Brand_id    *string `form:"brand_id"`
+	Category_id *string `form:"category_id"`
+	Search      *string `form:"search"`
+	Sort        *string `form:"sort"`
 }
 
 func (q *Query_args) Normalize() {

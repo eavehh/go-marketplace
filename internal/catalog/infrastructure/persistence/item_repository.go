@@ -235,8 +235,8 @@ func (r *item_repository) Catalog_items(ctx context.Context, args spec.Query_arg
 
 	sql_base_form := `
 	FROM catalog_items ci
-	LEFT JOIN brands b ON ci.brand_id = b.id
-	LEFT JOIN categories c ON ci.category_id = c.id
+	LEFT JOIN brands brnd ON ci.brand_id = brnd.id
+	LEFT JOIN categories ctg ON ci.category_id = ctg.id
 	`
 	var condition []string
 	var params []any
@@ -341,10 +341,7 @@ func (r *item_repository) Catalog_items(ctx context.Context, args spec.Query_arg
 		}
 		items = append(items, *item)
 	}
-	if err != nil {
-		return spec.Pagination[entity.Catalog_item]{}, err
 
-	}
 	return spec.Pagination[entity.Catalog_item]{
 		Page_index:  args.Page_index,
 		Page_size:   args.Page_size,

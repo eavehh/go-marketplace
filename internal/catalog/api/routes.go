@@ -9,6 +9,7 @@ func Register_routes(r *gin.Engine,
 	brands *handlers.Brands_handler,
 	categories *handlers.Categories_handler,
 	items *handlers.Catalog_items_handler,
+	items_v2 *handlers.Catalog_items_handler_v2,
 ) {
 	v1 := r.Group("/api/v1")
 
@@ -22,4 +23,9 @@ func Register_routes(r *gin.Engine,
 	v1.POST("/catalog-items", items.Create_item)
 	v1.PUT("/catalog-items", items.Update_item)
 	v1.DELETE("/catalog-items/:id", items.Delete_item)
+
+	v2 := r.Group("/api/v2")
+
+	v2.GET("/catalog-items", items_v2.Catalog_items)
+
 }
