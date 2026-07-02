@@ -10,10 +10,13 @@ import (
 
 	"github.com/eavehh/marketpl.microserv/internal/catalog/api"
 	"github.com/eavehh/marketpl.microserv/internal/catalog/api/handlers"
-	commands "github.com/eavehh/marketpl.microserv/internal/catalog/application/comands"
+	"github.com/eavehh/marketpl.microserv/internal/catalog/application/commands"
 	"github.com/eavehh/marketpl.microserv/internal/catalog/application/queries"
 	"github.com/eavehh/marketpl.microserv/internal/catalog/infrastructure/persistence"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
@@ -27,10 +30,12 @@ func main() {
 	pg_host := os.Getenv("CATALOG_PG_HOST")
 	pg_port := os.Getenv("CATALOG_PG_PORT")
 	pg_user := os.Getenv("CATALOG_PG_USER")
-	pg_pass := os.Getenv("CATALOG_PG_PASS")
-	pg_db := os.Getenv("CATALOG_PG_DB")
-	pg_ssl := os.Getenv("CATALOG_PG_SSL")
-
+	pg_pass := os.Getenv("CATALOG_PG_PASSWORD")
+	pg_db := os.Getenv("CATALOG_PG_DATABASE")
+	pg_ssl := os.Getenv("CATALOG_PG_SSLMODE")
+	migrations_path := os.Getenv("CATALOG_MIGRATIONS_PATH")
+	app_port := ":" + os.Getenv("CATALOG_APP_PORT")
+	// app_port := ":9001"
 	dsn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		pg_host, pg_port, pg_user, pg_pass, pg_db, pg_ssl,
@@ -41,7 +46,7 @@ func main() {
 	}
 	defer db.Close()
 	if err = db.Ping(); err != nil {
-		log.Fatal(err, "if err = db.Ping()")
+		log.Fatal(err, "Cannot connect to the DB; if err = db.Ping()")
 	}
 
 	engine := gin.Default()
@@ -50,6 +55,21 @@ func main() {
 			"status": "ok",
 		})
 	})
+
+	log.Println("Successfully connect to the DB ")
+
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	if err != nil {
+		log.Fatal("Automigrate: postgres.WithInstance error: ", err)
+	}
+	m, err := migrate.NewWithDatabaseInstance(migrations_path, "postgres", driver)
+	if err != nil {
+		log.Fatal("Automigrate: migrate.NewWithDatabaseInstance error: ", err)
+	}
+
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		log.Fatal("Automigrate: migrate.up error: ", err)
+	}
 
 	brands_repo := persistence.New_brand_repo(db)
 	categories_repo := persistence.New_Category_repo(db)
@@ -85,8 +105,9 @@ func main() {
 		items_handler,
 		items_handler_v2,
 	)
+	log.Printf("Start server on port %s/n", app_port)
 
-	if err := engine.Run(":9001"); err != nil {
+	if err := engine.Run(app_port); err != nil {
 		log.Fatal(err.Error())
 	}
 }

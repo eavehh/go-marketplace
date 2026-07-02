@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	commands "github.com/eavehh/marketpl.microserv/internal/catalog/application/comands"
+	"github.com/eavehh/marketpl.microserv/internal/catalog/application/commands"
 	"github.com/eavehh/marketpl.microserv/internal/catalog/application/queries"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
