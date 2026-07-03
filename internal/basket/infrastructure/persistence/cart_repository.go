@@ -1,0 +1,74 @@
+package persistence
+
+import (
+	"context"
+	"database/sql"
+
+	"github.com/eavehh/marketpl.microserv/internal/basket/domain"
+	"github.com/google/uuid"
+)
+
+type Cart_repository struct {
+	db *sql.DB
+}
+
+func New_cart_repository(db *sql.DB) *Cart_repository {
+	return &Cart_repository{db: db}
+}
+
+func (r *Cart_repository) Save(ctx context.Context, cart domain.Shopping_cart) (*domain.Shopping_cart, error) {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	defer tx.Rollback()
+
+	_, err = tx.ExecContext(ctx,
+		`INSERT INTO shopping_carts (account_name)
+	VALUES ($1)
+	ON CONFLICT (account_name) DO NOTHING`,
+		cart.Account_name,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = tx.ExecContext(ctx,
+		`DELETE FROM shopping_cart_items
+	WHERE account_name = $1`,
+		cart.Account_name,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, item := range cart.Items {
+		if item.Item_id == uuid.Nil {
+			item.Item_id = uuid.New()
+		}
+
+		_, err = tx.ExecContext(ctx,
+			`INSERT INTO shopping_cart_items
+			(account_name, item_id, quantity, unit_price, item_title, item_note)
+			VALUES ($1, $2, $3, $4, $5, $6)`,
+			cart.Account_name,
+			item.Item_id,
+			item.Quantity,
+			item.Unit_price,
+			item.Item_title,
+			item.Item_note,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return &cart, nil
+}
