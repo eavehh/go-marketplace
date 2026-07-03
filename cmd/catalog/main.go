@@ -42,11 +42,26 @@ func main() {
 	)
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		log.Fatal(err, "sql.Open(postgres, dsn)")
+		log.Fatal(err, "CATALOG: sql.Open(postgres, dsn)")
 	}
 	defer db.Close()
 	if err = db.Ping(); err != nil {
-		log.Fatal(err, "Cannot connect to the DB; if err = db.Ping()")
+		log.Fatal(err, "CATALOG: Cannot connect to the DB; if err = db.Ping()")
+	}
+
+	log.Println("Successfully connect to the DB ")
+
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	if err != nil {
+		log.Fatal("CATALOG: Automigrate: postgres.WithInstance error: ", err)
+	}
+	m, err := migrate.NewWithDatabaseInstance(migrations_path, "postgres", driver)
+	if err != nil {
+		log.Fatal("CATALOG: Automigrate: migrate.NewWithDatabaseInstance error: ", err)
+	}
+
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		log.Fatal("CATALOG: Automigrate: migrate.up error: ", err)
 	}
 
 	engine := gin.Default()
@@ -55,21 +70,6 @@ func main() {
 			"status": "ok",
 		})
 	})
-
-	log.Println("Successfully connect to the DB ")
-
-	driver, err := postgres.WithInstance(db, &postgres.Config{})
-	if err != nil {
-		log.Fatal("Automigrate: postgres.WithInstance error: ", err)
-	}
-	m, err := migrate.NewWithDatabaseInstance(migrations_path, "postgres", driver)
-	if err != nil {
-		log.Fatal("Automigrate: migrate.NewWithDatabaseInstance error: ", err)
-	}
-
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatal("Automigrate: migrate.up error: ", err)
-	}
 
 	brands_repo := persistence.New_brand_repo(db)
 	categories_repo := persistence.New_Category_repo(db)
