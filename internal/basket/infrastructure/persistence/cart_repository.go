@@ -16,7 +16,7 @@ func New_cart_repository(db *sql.DB) *Cart_repository {
 	return &Cart_repository{db: db}
 }
 
-func (r *Cart_repository) Save(ctx context.Context, cart domain.Shopping_cart) (*domain.Shopping_cart, error) {
+func (r *Cart_repository) Save(ctx context.Context, cart *domain.Shopping_cart) (*domain.Shopping_cart, error) {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -45,7 +45,8 @@ func (r *Cart_repository) Save(ctx context.Context, cart domain.Shopping_cart) (
 		return nil, err
 	}
 
-	for _, item := range cart.Items {
+	for i := range cart.Items {
+		item := &cart.Items[i]
 		if item.Item_id == uuid.Nil {
 			item.Item_id = uuid.New()
 		}
@@ -70,5 +71,5 @@ func (r *Cart_repository) Save(ctx context.Context, cart domain.Shopping_cart) (
 		return nil, err
 	}
 
-	return &cart, nil
+	return cart, nil
 }

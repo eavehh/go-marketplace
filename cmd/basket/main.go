@@ -5,6 +5,10 @@ import (
 	"log"
 	"os"
 
+	"github.com/eavehh/marketpl.microserv/internal/basket/api"
+	"github.com/eavehh/marketpl.microserv/internal/basket/api/handlers"
+	"github.com/eavehh/marketpl.microserv/internal/basket/application/commands"
+	"github.com/eavehh/marketpl.microserv/internal/basket/infrastructure/persistence"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -47,11 +51,16 @@ func main() {
 		log.Fatal("BASKET: Automigrate: migrate.up error: ", err)
 	}
 
-	r := gin.Default()
+	repo := persistence.New_cart_repository(db)
+	save_cart_handler := commands.New_save_cart_handler(repo)
+	cart_handler := handlers.New_cart_handler(save_cart_handler)
 
+	r := gin.Default()
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
+
+	api.Register_routes(r, cart_handler)
 
 	if err := r.Run(":" + app_post); err != nil {
 		log.Fatal(err)

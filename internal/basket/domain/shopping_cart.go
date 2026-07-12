@@ -1,8 +1,8 @@
 package domain
 
 type Shopping_cart struct {
-	Account_name string               `json:"account_name"`
-	Items        []Shopping_cart_item `json:"items"`
+	Account_name string               `json:"account_name"  validate:"required, max=20"`
+	Items        []Shopping_cart_item `json:"items" validate:"required,min=1,deve"`
 }
 
 func (sc *Shopping_cart) Total_price() float64 {
