@@ -23,9 +23,7 @@ func (h *Cart_handler) Save_cart(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		_ = c.Error(err)
 		return
 	}
 
@@ -34,14 +32,12 @@ func (h *Cart_handler) Save_cart(c *gin.Context) {
 		commands.Save_cart_command{Cart: req.Cart},
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		_ = c.Error(err)
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"account_name": account_name,
-		"location": fmt.Sprintf("%s/%s", c.FullPath(), account_name),
+		"location":     fmt.Sprintf("%s/%s", c.FullPath(), account_name),
 	})
 }

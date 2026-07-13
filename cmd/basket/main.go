@@ -9,6 +9,7 @@ import (
 	"github.com/eavehh/marketpl.microserv/internal/basket/api/handlers"
 	"github.com/eavehh/marketpl.microserv/internal/basket/application/commands"
 	"github.com/eavehh/marketpl.microserv/internal/basket/infrastructure/persistence"
+	"github.com/eavehh/marketpl.microserv/internal/shared"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -56,6 +57,8 @@ func main() {
 	cart_handler := handlers.New_cart_handler(save_cart_handler)
 
 	r := gin.Default()
+	r.Use(shared.Err_handler_middleware())
+	
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
