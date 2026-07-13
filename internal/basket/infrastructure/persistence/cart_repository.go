@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/eavehh/marketpl.microserv/internal/basket/domain"
 	"github.com/google/uuid"
@@ -72,4 +73,62 @@ func (r *Cart_repository) Save(ctx context.Context, cart *domain.Shopping_cart) 
 	}
 
 	return cart, nil
+}
+
+func (r *Cart_repository) Get(ctx context.Context, account_name string) (*domain.Shopping_cart, error) {
+	var exist bool
+
+	err := r.db.QueryRowContext(ctx,
+		`SELECT EXIST(
+	SELECT 1 FROM shopping_carts
+	WHERE account_name = $1
+	)`,
+		account_name,
+	).Scan(&exist)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !exist {
+		return nil, fmt.Errorf("cart for %s does not exist", account_name)
+	}
+
+	rows, err := r.db.QueryContext(ctx,
+		`SELECT item_id quantity unit_price item_title item_note
+	FROM shopping_cart_items
+	WHERE account_name = $1
+	`,
+		account_name)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var items []domain.Shopping_cart_item
+	for rows.Next() {
+		var item domain.Shopping_cart_item
+		err := rows.Scan(
+			&item.Item_id,
+			&item.Quantity,
+			&item.Unit_price,
+			&item.Item_title,
+			&item.Item_note,
+		)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return &domain.Shopping_cart{
+		Account_name: account_name,
+		Items:        items,
+	}, nil
 }
