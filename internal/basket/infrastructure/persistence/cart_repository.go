@@ -3,9 +3,9 @@ package persistence
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/eavehh/marketpl.microserv/internal/basket/domain"
+	"github.com/eavehh/marketpl.microserv/internal/shared"
 	"github.com/google/uuid"
 )
 
@@ -91,7 +91,7 @@ func (r *Cart_repository) Get(ctx context.Context, account_name string) (*domain
 	}
 
 	if !exist {
-		return nil, fmt.Errorf("cart for %s does not exist", account_name)
+		return nil, shared.New_not_fount_error("cart", account_name)
 	}
 
 	rows, err := r.db.QueryContext(ctx,
