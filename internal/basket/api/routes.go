@@ -11,4 +11,5 @@ func Register_routes(r *gin.Engine,
 	v1 := r.Group("/api/v1")
 
 	v1.POST("/cart", cart_handler.Save_cart)
+	v1.GET("/cart/:account_name", cart_handler.Get_cart)
 }

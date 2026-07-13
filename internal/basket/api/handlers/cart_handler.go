@@ -5,16 +5,23 @@ import (
 	"net/http"
 
 	"github.com/eavehh/marketpl.microserv/internal/basket/application/commands"
+	"github.com/eavehh/marketpl.microserv/internal/basket/application/queries"
 	"github.com/eavehh/marketpl.microserv/internal/basket/domain"
 	"github.com/gin-gonic/gin"
 )
 
 type Cart_handler struct {
 	save_cart *commands.Save_cart_handler
+	get_cart  *queries.Get_cart_handler
 }
 
-func New_cart_handler(save_cart *commands.Save_cart_handler) *Cart_handler {
-	return &Cart_handler{save_cart: save_cart}
+func New_cart_handler(save_cart *commands.Save_cart_handler,
+	get_cart *queries.Get_cart_handler,
+) *Cart_handler {
+	return &Cart_handler{
+		save_cart: save_cart,
+		get_cart:  get_cart,
+	}
 }
 
 func (h *Cart_handler) Save_cart(c *gin.Context) {
@@ -39,5 +46,19 @@ func (h *Cart_handler) Save_cart(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"account_name": account_name,
 		"location":     fmt.Sprintf("%s/%s", c.FullPath(), account_name),
+	})
+}
+
+func (h *Cart_handler) Get_cart(c *gin.Context) {
+	account_name := c.Param("account_name")
+
+	cart, err := h.get_cart.Handle(c.Request.Context(), account_name)
+	if err != nil {
+		_ = c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"result": cart,
 	})
 }

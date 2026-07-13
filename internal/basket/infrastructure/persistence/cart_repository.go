@@ -79,7 +79,7 @@ func (r *Cart_repository) Get(ctx context.Context, account_name string) (*domain
 	var exist bool
 
 	err := r.db.QueryRowContext(ctx,
-		`SELECT EXIST(
+		`SELECT EXISTS(
 	SELECT 1 FROM shopping_carts
 	WHERE account_name = $1
 	)`,
@@ -95,7 +95,7 @@ func (r *Cart_repository) Get(ctx context.Context, account_name string) (*domain
 	}
 
 	rows, err := r.db.QueryContext(ctx,
-		`SELECT item_id quantity unit_price item_title item_note
+		`SELECT item_id, quantity, unit_price, item_title, item_note
 	FROM shopping_cart_items
 	WHERE account_name = $1
 	`,
