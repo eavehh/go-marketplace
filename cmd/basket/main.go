@@ -56,8 +56,13 @@ func main() {
 	repo := persistence.New_cart_repository(db)
 	save_cart_handler := commands.New_save_cart_handler(repo)
 	get_cart_handler := queries.New_get_cart_handler(repo)
+	delete_cart_handler := commands.New_delete_handler(repo)
 
-	cart_handler := handlers.New_cart_handler(save_cart_handler, get_cart_handler)
+	cart_handler := handlers.New_cart_handler(
+		save_cart_handler,
+		get_cart_handler,
+		delete_cart_handler,
+	)
 
 	r := gin.Default()
 	r.Use(shared.Err_handler_middleware())

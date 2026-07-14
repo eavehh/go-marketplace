@@ -11,16 +11,20 @@ import (
 )
 
 type Cart_handler struct {
-	save_cart *commands.Save_cart_handler
-	get_cart  *queries.Get_cart_handler
+	save_cart   *commands.Save_cart_handler
+	get_cart    *queries.Get_cart_handler
+	delete_cart *commands.Delete_cart_handler
 }
 
-func New_cart_handler(save_cart *commands.Save_cart_handler,
+func New_cart_handler(
+	save_cart *commands.Save_cart_handler,
 	get_cart *queries.Get_cart_handler,
+	delete_cart *commands.Delete_cart_handler,
 ) *Cart_handler {
 	return &Cart_handler{
-		save_cart: save_cart,
-		get_cart:  get_cart,
+		save_cart:   save_cart,
+		get_cart:    get_cart,
+		delete_cart: delete_cart,
 	}
 }
 
@@ -60,5 +64,21 @@ func (h *Cart_handler) Get_cart(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"result": cart,
+	})
+}
+
+func (h *Cart_handler) Delete_cart(c *gin.Context) {
+	account_name := c.Param("account_name")
+
+	err := h.delete_cart.Handle(c.Request.Context(), account_name)
+
+	if err != nil {
+		_ = c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"account_name": account_name,
+		"result":       "success",
 	})
 }

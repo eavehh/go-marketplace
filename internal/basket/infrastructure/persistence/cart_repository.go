@@ -132,3 +132,21 @@ func (r *Cart_repository) Get(ctx context.Context, account_name string) (*domain
 		Items:        items,
 	}, nil
 }
+
+func (r *Cart_repository) Delete(ctx context.Context, account_name string) error {
+	result, err := r.db.ExecContext(ctx,
+		`DELETE FROM shopping_carts
+	WHERE account_name = $1
+	`,
+		account_name)
+
+	if err != nil {
+		return err
+	}
+
+	n, _ := result.RowsAffected()
+	if n == 0 {
+		return shared.New_not_fount_error("cart", account_name)
+	}
+	return nil
+}

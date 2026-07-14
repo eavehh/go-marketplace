@@ -12,4 +12,5 @@ func Register_routes(r *gin.Engine,
 
 	v1.POST("/cart", cart_handler.Save_cart)
 	v1.GET("/cart/:account_name", cart_handler.Get_cart)
+	v1.DELETE("/cart/:account_name", cart_handler.Delete_cart)
 }
