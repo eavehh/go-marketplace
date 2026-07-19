@@ -47,10 +47,23 @@ services:
       retries: 5
       start_period: 30s
 
+  basket_cache_redis_dev:
+    container_name: basket-redis-dev
+    image: redis:7
+    command: redis-server --requirepass "123456789" --protected-mode no
+    restart: always
+    ports:
+      - "9112:6379"
+    volumes:
+      - redis_basket_dev:/data
+    networks:
+      - marketplace-dev-net
+
 
 volumes:
     postgres_catalog_dev:
     postgres_basket_dev:
+    redis_basket_dev:
 
 networks: 
   marketplace-dev-net:

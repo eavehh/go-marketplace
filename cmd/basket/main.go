@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"log"
 	"os"
@@ -8,7 +9,9 @@ import (
 	"github.com/eavehh/marketpl.microserv/internal/basket/api"
 	"github.com/eavehh/marketpl.microserv/internal/basket/api/handlers"
 	"github.com/eavehh/marketpl.microserv/internal/basket/application/commands"
+	"github.com/eavehh/marketpl.microserv/internal/basket/application/interfaces"
 	"github.com/eavehh/marketpl.microserv/internal/basket/application/queries"
+	"github.com/eavehh/marketpl.microserv/internal/basket/infrastructure/cache"
 	"github.com/eavehh/marketpl.microserv/internal/basket/infrastructure/persistence"
 	"github.com/eavehh/marketpl.microserv/internal/shared"
 	"github.com/gin-gonic/gin"
@@ -17,6 +20,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/redis/go-redis/v9"
 )
 
 func main() {
@@ -26,8 +30,9 @@ func main() {
 
 	app_post := os.Getenv("BASKET_APP_PORT")
 	migrations_path := os.Getenv("BASKET_MIGRATIONS_PATH")
-
 	dsn := os.Getenv("BASKET_DATABASE_URL")
+	redis_url := os.Getenv("BASKET_REDIS_URL")
+	redis_password := os.Getenv("BASKET_REDIS_PASSWORD")
 
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
@@ -53,7 +58,25 @@ func main() {
 		log.Fatal("BASKET: Automigrate: migrate.up error: ", err)
 	}
 
-	repo := persistence.New_cart_repository(db)
+	redis_client := redis.NewClient(&redis.Options{
+		Addr:     redis_url,
+		Password: redis_password,
+		DB:       0,
+	})
+
+	if err := redis_client.Ping(context.Background()).Err(); err != nil {
+		log.Fatal("redis ping error")
+	}
+	log.Println("redis connected")
+
+	defer redis_client.Close()
+
+	pg_repo := persistence.New_cart_repository(db)
+
+	var repo interfaces.Cart_repository = cache.New_redis_cart_repository(
+		pg_repo, 
+		redis_client,
+	)
 	save_cart_handler := commands.New_save_cart_handler(repo)
 	get_cart_handler := queries.New_get_cart_handler(repo)
 	delete_cart_handler := commands.New_delete_handler(repo)

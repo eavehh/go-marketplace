@@ -80,11 +80,51 @@ services:
       retries: 5
       start_period: 30s
   
+  basket_cache_redis_prod:
+    container_name: basket-redis-prod
+    image: redis:7
+    command: redis-server --requirepass "123456789" --protected-mode no
+    restart: always
+    ports:
+      - "9312:6379"
+    volumes:
+      - redis_basket_prod:/data
+    networks:
+      - marketplace-prod-net
 
+  basket_api:
+    container_name: basket-api
+    build:
+      context: .
+      dockerfile: cmd/basket/Dockerfile
+    ports:
+      - "9202:7002"
+    networks:
+      - marketplace-prod-net
+    environment:
+      - BASKET_APP_PORT=7002
+      - BASKET_DATABASE_URL=postgres://postgres:123456789@basket_db_prod:5432/basket_db_prod?sslmode=disable
+      - BASKET_MIGRATIONS_PATH=file:///app/migrations/basket
+      - BASKET_REDIS_URL=basket_cache_redis_prod:6379
+      - BASKET_REDIS_PASSWORD=123456789
+    depends_on:
+      basket_db_prod:
+        condition: service_healthy
+      basket_cache_redis_prod:
+        condition: service_started
+
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:7002/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
 
 volumes:
     postgres_catalog_prod:
     postgres_basket_prod:
+    redis_basket_prod:
 
 networks: 
   marketplace-prod-net:
