@@ -12,8 +12,10 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/eavehh/marketpl.microserv/internal/promotion/application/queries"
 	promotion_grpc "github.com/eavehh/marketpl.microserv/internal/promotion/grpc"
 	pb "github.com/eavehh/marketpl.microserv/internal/promotion/grpc/pb"
+	"github.com/eavehh/marketpl.microserv/internal/promotion/infrastructure/persistence"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/mysql"
@@ -52,12 +54,12 @@ func main() {
 		log.Fatalf("open_db error: %v", err)
 	}
 	defer db.Close()
-	log.Print("mysql connected")
+	log.Print("mysql connected") 
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	if err := run_grpc_server(ctx, cfg.Grpc_port); err != nil {
+	if err := run_grpc_server(ctx, cfg.Grpc_port, db); err != nil {
 		log.Fatalf("run_grpc_server: %v", err)
 	}
 }
@@ -115,7 +117,7 @@ func run_migrations(db *sql.DB, migrations_path string) error {
 	return nil
 }
 
-func run_grpc_server(ctx context.Context, port string) error {
+func run_grpc_server(ctx context.Context, port string, db *sql.DB) error {
 	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		return fmt.Errorf("net.Listen: %w", err)
@@ -124,7 +126,12 @@ func run_grpc_server(ctx context.Context, port string) error {
 	grpc_server := grpc.NewServer()
 	greet_service := promotion_grpc.New_greeter_service()
 
+	repo := persistence.New_promo_repository(db)
+	query_handler := queries.New_get_by_catalog_item_handler(repo)
+	promo_service := promotion_grpc.NewPromotionService(query_handler)
+
 	pb.RegisterGreeterServer(grpc_server, greet_service)
+	pb.RegisterPromotionServiceServer(grpc_server, promo_service)
 
 	reflection.Register(grpc_server)
 	// postman (server reflection)
