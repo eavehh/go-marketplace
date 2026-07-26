@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "github.com/eavehh/marketpl.microserv/internal/promotion/grpc/pb";
+
+package greet;
+
+service Greeter {
+    rpc Say_hello(Hello_request) returns (Hello_reply);
+}
+
+message Hello_request{
+    string name = 1;
+}
+
+message Hello_reply{
+    string msg =1;
+}
