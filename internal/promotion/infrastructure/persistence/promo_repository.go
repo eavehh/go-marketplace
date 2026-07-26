@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/eavehh/marketpl.microserv/internal/promotion/domain"
 )
@@ -34,7 +35,7 @@ func (r *Promo_repository) Find_by_catalog_item(ctx context.Context, catalog_ite
 		&p.Title,
 		&p.Value,
 	)
- 
+
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -44,4 +45,29 @@ func (r *Promo_repository) Find_by_catalog_item(ctx context.Context, catalog_ite
 	}
 
 	return &p, nil
+}
+
+func (r *Promo_repository) Create(ctx context.Context, promo *domain.Promo) (bool, error) {
+	query :=
+		`
+	INSERT INTO promos(id, catalog_item_id, item, value)
+	VALUES (?,?,?,?)
+	`
+
+	result, err := r.db.ExecContext(ctx, query,
+		promo.Id,
+		promo.Catalog_item_id,
+		promo.Title,
+		promo.Value,
+	)
+
+	if err != nil {
+		return false, fmt.Errorf("repo error: %v", err)
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	return rows > 0, nil
 }

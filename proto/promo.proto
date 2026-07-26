@@ -6,6 +6,7 @@ package promotion;
 
 service PromotionService{
     rpc GetPromoByCatalogItem(GetPromoByCatalogItemRequest) returns(GetPromoByCatalogItemResponse);
+    rpc CreatePromo(CreatePromoRequest) returns(CreatePromoResponse);
 }
 
 message GetPromoByCatalogItemRequest{
@@ -14,6 +15,16 @@ message GetPromoByCatalogItemRequest{
 
 message GetPromoByCatalogItemResponse{
     Promotion promotion = 1;
+}
+
+message CreatePromoRequest{
+    string catalog_item_id=1;
+    string title =2;
+    string value =3;
+}message CreatePromoResponse{
+    string id=1;
+    bool success=2;
+    string description=3;
 }
 
 message Promotion{
