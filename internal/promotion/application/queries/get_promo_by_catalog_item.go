@@ -22,3 +22,4 @@ func New_get_by_catalog_item_handler(repo interfaces.Promorion_repository) *Get_
 func (h *Get_by_catalog_item_handler) Handle(ctx context.Context, q Get_by_catalog_item_query) (*domain.Promo, error) {
 	return h.repo.Find_by_catalog_item(ctx, q.Catalog_item_id)
 }
+ 
