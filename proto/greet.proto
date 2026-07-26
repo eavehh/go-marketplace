@@ -2,6 +2,8 @@ syntax = "proto3";
 
 option go_package = "github.com/eavehh/marketpl.microserv/internal/promotion/grpc/pb";
 
+// protoc --proto_path=proto --go_out=internal/promotion/grpc/pb --go_opt=paths=source_relative --go-grpc_out=internal/promotion/grpc/pb --go-grpc_opt=paths=source_relative proto/greet.proto
+
 package greet;
 
 service Greeter {
