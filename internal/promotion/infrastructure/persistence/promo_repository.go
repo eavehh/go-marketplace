@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/eavehh/marketpl.microserv/internal/promotion/domain"
 )
@@ -50,7 +51,7 @@ func (r *Promo_repository) Find_by_catalog_item(ctx context.Context, catalog_ite
 func (r *Promo_repository) Create(ctx context.Context, promo *domain.Promo) (bool, error) {
 	query :=
 		`
-	INSERT INTO promos(id, catalog_item_id, item, value)
+	INSERT INTO promos(id, catalog_item_id, title, value)
 	VALUES (?,?,?,?)
 	`
 
@@ -62,6 +63,11 @@ func (r *Promo_repository) Create(ctx context.Context, promo *domain.Promo) (boo
 	)
 
 	if err != nil {
+
+		if (strings.Contains(err.Error(), "Dublicate entity")) ||
+			strings.Contains(err.Error(), "unique_catalog_item_id") {
+			return false, fmt.Errorf("promo for catalog_item_id (%s) alredy exist: %v", promo.Catalog_item_id, err)
+		}
 		return false, fmt.Errorf("repo error: %v", err)
 	}
 

@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 
+	"github.com/eavehh/marketpl.microserv/internal/promotion/application/commands"
 	"github.com/eavehh/marketpl.microserv/internal/promotion/application/queries"
 	"github.com/eavehh/marketpl.microserv/internal/promotion/grpc/pb"
 	"google.golang.org/grpc/codes"
@@ -11,11 +12,18 @@ import (
 
 type PromotionService struct {
 	pb.UnimplementedPromotionServiceServer
-	queryHandler *queries.Get_by_catalog_item_handler
+	GetByCatalogItem *queries.Get_by_catalog_item_handler
+	CreateHandler    *commands.Create_promo_handler
 }
 
-func NewPromotionService(queryHandler *queries.Get_by_catalog_item_handler) *PromotionService {
-	return &PromotionService{queryHandler: queryHandler}
+func NewPromotionService(
+	queryHandler *queries.Get_by_catalog_item_handler,
+	commandHandler *commands.Create_promo_handler,
+) *PromotionService {
+	return &PromotionService{
+		GetByCatalogItem: queryHandler,
+		CreateHandler:    commandHandler,
+	}
 }
 
 func (s PromotionService) GetPromoByCatalogItem(ctx context.Context, req *pb.GetPromoByCatalogItemRequest) (*pb.GetPromoByCatalogItemResponse, error) {
@@ -23,7 +31,7 @@ func (s PromotionService) GetPromoByCatalogItem(ctx context.Context, req *pb.Get
 		Catalog_item_id: req.CatalogItemId,
 	}
 
-	p, err := s.queryHandler.Handle(ctx, *query)
+	p, err := s.GetByCatalogItem.Handle(ctx, *query)
 
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
@@ -38,5 +46,29 @@ func (s PromotionService) GetPromoByCatalogItem(ctx context.Context, req *pb.Get
 			Title:         p.Title,
 			Value:         p.Value,
 		},
+	}, nil
+}
+
+func (s PromotionService) CreatePromo(ctx context.Context, req *pb.CreatePromoRequest) (*pb.CreatePromoResponse, error) {
+	// if req == nil {
+	// 	return nil, status.Errorf(codes.Canceled, "Internal error: %v")
+	// }
+
+	cmd := &commands.Create_promo_command{
+		Catalog_item_id: req.CatalogItemId,
+		Title:           req.Title,
+		Value:           req.Value,
+	}
+
+	result, err := s.CreateHandler.Handle(ctx, *cmd)
+
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Internal error: %v", err)
+	}
+
+	return &pb.CreatePromoResponse{
+		Id:          result.Id,
+		Success:     result.Success,
+		Description: result.Description,
 	}, nil
 }

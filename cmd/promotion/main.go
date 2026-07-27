@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/eavehh/marketpl.microserv/internal/promotion/application/commands"
 	"github.com/eavehh/marketpl.microserv/internal/promotion/application/queries"
 	promotion_grpc "github.com/eavehh/marketpl.microserv/internal/promotion/grpc"
 	pb "github.com/eavehh/marketpl.microserv/internal/promotion/grpc/pb"
@@ -54,7 +55,7 @@ func main() {
 		log.Fatalf("open_db error: %v", err)
 	}
 	defer db.Close()
-	log.Print("mysql connected") 
+	log.Print("mysql connected")
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -128,7 +129,8 @@ func run_grpc_server(ctx context.Context, port string, db *sql.DB) error {
 
 	repo := persistence.New_promo_repository(db)
 	query_handler := queries.New_get_by_catalog_item_handler(repo)
-	promo_service := promotion_grpc.NewPromotionService(query_handler)
+	command_handler := commands.New_create_promo_handler(repo)
+	promo_service := promotion_grpc.NewPromotionService(query_handler, command_handler)
 
 	pb.RegisterGreeterServer(grpc_server, greet_service)
 	pb.RegisterPromotionServiceServer(grpc_server, promo_service)
