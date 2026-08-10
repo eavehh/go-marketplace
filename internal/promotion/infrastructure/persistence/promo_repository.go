@@ -77,3 +77,19 @@ func (r *Promo_repository) Create(ctx context.Context, promo *domain.Promo) (boo
 	}
 	return rows > 0, nil
 }
+func (r *Promo_repository) Update(ctx context.Context, promo *domain.Promo) (bool, error) {
+	query := `
+	 	UPDATE promos SET title = ?, value = ?
+		WHERE id = ?
+	 `
+
+	result, err := r.db.ExecContext(ctx, query, promo.Title, promo.Value, promo.Id)
+
+	if err != nil {
+		return false, err
+	}
+
+	rows, _ := result.RowsAffected()
+	return rows > 0, nil
+
+}
