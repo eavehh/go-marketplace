@@ -129,8 +129,9 @@ func run_grpc_server(ctx context.Context, port string, db *sql.DB) error {
 
 	repo := persistence.New_promo_repository(db)
 	query_handler := queries.New_get_by_catalog_item_handler(repo)
-	command_handler := commands.New_create_promo_handler(repo)
-	promo_service := promotion_grpc.NewPromotionService(query_handler, command_handler)
+	create_handler := commands.New_create_promo_handler(repo)
+	update_handler := commands.New_update_promo_handler(repo)
+	promo_service := promotion_grpc.NewPromotionService(query_handler, create_handler, update_handler)
 
 	pb.RegisterGreeterServer(grpc_server, greet_service)
 	pb.RegisterPromotionServiceServer(grpc_server, promo_service)

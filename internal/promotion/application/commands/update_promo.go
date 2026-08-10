@@ -2,6 +2,8 @@ package commands
 
 import (
 	"context"
+	"fmt"
+	"strconv"
 
 	"github.com/eavehh/marketpl.microserv/internal/promotion/application/interfaces"
 	"github.com/eavehh/marketpl.microserv/internal/promotion/domain"
@@ -33,6 +35,10 @@ func (h *Update_promo_handler) Handle(ctx context.Context, cmd Update_promo_comm
 		Value: cmd.Value,
 	}
 
+	int_promo, _ := strconv.Atoi(promo.Value)
+	if int_promo <= 0 {
+		return nil, fmt.Errorf("promo value <= 0 %v", int_promo)
+	}
 	success, err := h.repo.Update(ctx, promo)
 	if err != nil {
 		return nil, err

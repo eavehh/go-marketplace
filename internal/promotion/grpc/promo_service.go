@@ -20,10 +20,13 @@ type PromotionService struct {
 func NewPromotionService(
 	queryHandler *queries.Get_by_catalog_item_handler,
 	commandHandler *commands.Create_promo_handler,
+	updateHandler *commands.Update_promo_handler,
+
 ) *PromotionService {
 	return &PromotionService{
 		GetByCatalogItem: queryHandler,
 		CreateHandler:    commandHandler,
+		UpdateHandler:    updateHandler,
 	}
 }
 
