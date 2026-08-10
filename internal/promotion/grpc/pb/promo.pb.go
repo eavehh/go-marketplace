@@ -341,6 +341,102 @@ func (x *UpdatePromoResponse) GetDescription() string {
 	return ""
 }
 
+type DeletePromoRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeletePromoRequest) Reset() {
+	*x = DeletePromoRequest{}
+	mi := &file_promo_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeletePromoRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeletePromoRequest) ProtoMessage() {}
+
+func (x *DeletePromoRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_promo_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeletePromoRequest.ProtoReflect.Descriptor instead.
+func (*DeletePromoRequest) Descriptor() ([]byte, []int) {
+	return file_promo_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *DeletePromoRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DeletePromoResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeletePromoResponse) Reset() {
+	*x = DeletePromoResponse{}
+	mi := &file_promo_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeletePromoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeletePromoResponse) ProtoMessage() {}
+
+func (x *DeletePromoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_promo_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeletePromoResponse.ProtoReflect.Descriptor instead.
+func (*DeletePromoResponse) Descriptor() ([]byte, []int) {
+	return file_promo_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *DeletePromoResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *DeletePromoResponse) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
 type Promotion struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -353,7 +449,7 @@ type Promotion struct {
 
 func (x *Promotion) Reset() {
 	*x = Promotion{}
-	mi := &file_promo_proto_msgTypes[6]
+	mi := &file_promo_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -365,7 +461,7 @@ func (x *Promotion) String() string {
 func (*Promotion) ProtoMessage() {}
 
 func (x *Promotion) ProtoReflect() protoreflect.Message {
-	mi := &file_promo_proto_msgTypes[6]
+	mi := &file_promo_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -378,7 +474,7 @@ func (x *Promotion) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Promotion.ProtoReflect.Descriptor instead.
 func (*Promotion) Descriptor() ([]byte, []int) {
-	return file_promo_proto_rawDescGZIP(), []int{6}
+	return file_promo_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *Promotion) GetId() string {
@@ -432,16 +528,22 @@ const file_promo_proto_rawDesc = "" +
 	"\x05value\x18\x03 \x01(\tR\x05value\"Q\n" +
 	"\x13UpdatePromoResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\"$\n" +
+	"\x12DeletePromoRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"Q\n" +
+	"\x13DeletePromoResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\"o\n" +
 	"\tPromotion\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12&\n" +
 	"\x0fcatalog_item_id\x18\x02 \x01(\tR\rcatalogItemId\x12\x14\n" +
 	"\x05title\x18\x03 \x01(\tR\x05title\x12\x14\n" +
-	"\x05value\x18\x04 \x01(\tR\x05value2\x9a\x02\n" +
+	"\x05value\x18\x04 \x01(\tR\x05value2\xe8\x02\n" +
 	"\x10PromotionService\x12j\n" +
 	"\x15GetPromoByCatalogItem\x12'.promotion.GetPromoByCatalogItemRequest\x1a(.promotion.GetPromoByCatalogItemResponse\x12L\n" +
 	"\vCreatePromo\x12\x1d.promotion.CreatePromoRequest\x1a\x1e.promotion.CreatePromoResponse\x12L\n" +
-	"\vUpdatePromo\x12\x1d.promotion.UpdatePromoRequest\x1a\x1e.promotion.UpdatePromoResponseBAZ?github.com/eavehh/marketpl.microserv/internal/promotion/grpc/pbb\x06proto3"
+	"\vUpdatePromo\x12\x1d.promotion.UpdatePromoRequest\x1a\x1e.promotion.UpdatePromoResponse\x12L\n" +
+	"\vDeletePromo\x12\x1d.promotion.DeletePromoRequest\x1a\x1e.promotion.DeletePromoResponseBAZ?github.com/eavehh/marketpl.microserv/internal/promotion/grpc/pbb\x06proto3"
 
 var (
 	file_promo_proto_rawDescOnce sync.Once
@@ -455,7 +557,7 @@ func file_promo_proto_rawDescGZIP() []byte {
 	return file_promo_proto_rawDescData
 }
 
-var file_promo_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_promo_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_promo_proto_goTypes = []any{
 	(*GetPromoByCatalogItemRequest)(nil),  // 0: promotion.GetPromoByCatalogItemRequest
 	(*GetPromoByCatalogItemResponse)(nil), // 1: promotion.GetPromoByCatalogItemResponse
@@ -463,18 +565,22 @@ var file_promo_proto_goTypes = []any{
 	(*CreatePromoResponse)(nil),           // 3: promotion.CreatePromoResponse
 	(*UpdatePromoRequest)(nil),            // 4: promotion.UpdatePromoRequest
 	(*UpdatePromoResponse)(nil),           // 5: promotion.UpdatePromoResponse
-	(*Promotion)(nil),                     // 6: promotion.Promotion
+	(*DeletePromoRequest)(nil),            // 6: promotion.DeletePromoRequest
+	(*DeletePromoResponse)(nil),           // 7: promotion.DeletePromoResponse
+	(*Promotion)(nil),                     // 8: promotion.Promotion
 }
 var file_promo_proto_depIdxs = []int32{
-	6, // 0: promotion.GetPromoByCatalogItemResponse.promotion:type_name -> promotion.Promotion
+	8, // 0: promotion.GetPromoByCatalogItemResponse.promotion:type_name -> promotion.Promotion
 	0, // 1: promotion.PromotionService.GetPromoByCatalogItem:input_type -> promotion.GetPromoByCatalogItemRequest
 	2, // 2: promotion.PromotionService.CreatePromo:input_type -> promotion.CreatePromoRequest
 	4, // 3: promotion.PromotionService.UpdatePromo:input_type -> promotion.UpdatePromoRequest
-	1, // 4: promotion.PromotionService.GetPromoByCatalogItem:output_type -> promotion.GetPromoByCatalogItemResponse
-	3, // 5: promotion.PromotionService.CreatePromo:output_type -> promotion.CreatePromoResponse
-	5, // 6: promotion.PromotionService.UpdatePromo:output_type -> promotion.UpdatePromoResponse
-	4, // [4:7] is the sub-list for method output_type
-	1, // [1:4] is the sub-list for method input_type
+	6, // 4: promotion.PromotionService.DeletePromo:input_type -> promotion.DeletePromoRequest
+	1, // 5: promotion.PromotionService.GetPromoByCatalogItem:output_type -> promotion.GetPromoByCatalogItemResponse
+	3, // 6: promotion.PromotionService.CreatePromo:output_type -> promotion.CreatePromoResponse
+	5, // 7: promotion.PromotionService.UpdatePromo:output_type -> promotion.UpdatePromoResponse
+	7, // 8: promotion.PromotionService.DeletePromo:output_type -> promotion.DeletePromoResponse
+	5, // [5:9] is the sub-list for method output_type
+	1, // [1:5] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -491,7 +597,7 @@ func file_promo_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_promo_proto_rawDesc), len(file_promo_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

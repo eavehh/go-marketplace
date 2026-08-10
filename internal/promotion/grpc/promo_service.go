@@ -15,18 +15,21 @@ type PromotionService struct {
 	GetByCatalogItem *queries.Get_by_catalog_item_handler
 	CreateHandler    *commands.Create_promo_handler
 	UpdateHandler    *commands.Update_promo_handler
+	DeleteHandler    *commands.Delete_promo_handler
 }
 
 func NewPromotionService(
 	queryHandler *queries.Get_by_catalog_item_handler,
 	commandHandler *commands.Create_promo_handler,
 	updateHandler *commands.Update_promo_handler,
+	deleteHandler *commands.Delete_promo_handler,
 
 ) *PromotionService {
 	return &PromotionService{
 		GetByCatalogItem: queryHandler,
 		CreateHandler:    commandHandler,
 		UpdateHandler:    updateHandler,
+		DeleteHandler:    deleteHandler,
 	}
 }
 
@@ -93,4 +96,21 @@ func (s PromotionService) UpdatePromo(ctx context.Context, req *pb.UpdatePromoRe
 		Success:     result.Success,
 		Description: result.Description,
 	}, nil
+}
+
+func (s PromotionService) DeletePromo(ctx context.Context, req *pb.DeletePromoRequest) (*pb.DeletePromoResponse, error) {
+	cmd := &commands.Delete_promo_command{
+		Catalog_item_id: req.Id,
+	}
+
+	result, err := s.DeleteHandler.Handle(ctx, *cmd)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
+	return &pb.DeletePromoResponse{
+		Success:     result,
+		Description: "",
+	}, nil
+
 }

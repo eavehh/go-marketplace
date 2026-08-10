@@ -77,6 +77,7 @@ func (r *Promo_repository) Create(ctx context.Context, promo *domain.Promo) (boo
 	}
 	return rows > 0, nil
 }
+
 func (r *Promo_repository) Update(ctx context.Context, promo *domain.Promo) (bool, error) {
 	query := `
 	 	UPDATE promos SET title = ?, value = ?
@@ -91,5 +92,18 @@ func (r *Promo_repository) Update(ctx context.Context, promo *domain.Promo) (boo
 
 	rows, _ := result.RowsAffected()
 	return rows > 0, nil
+
+}
+
+func (r *Promo_repository) Delete(ctx context.Context, catalog_item_id string) (bool, error) {
+	query := `DELETE FROM promos WHERE id = $1`
+
+	result, err := r.db.Exec(query, catalog_item_id)
+	if err != nil {
+		return false, fmt.Errorf("Delete promo: %v, error: %w", catalog_item_id, err)
+	}
+
+	n, _ := result.RowsAffected()
+	return n > 0, nil
 
 }
