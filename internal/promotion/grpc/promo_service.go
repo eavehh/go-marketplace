@@ -14,6 +14,7 @@ type PromotionService struct {
 	pb.UnimplementedPromotionServiceServer
 	GetByCatalogItem *queries.Get_by_catalog_item_handler
 	CreateHandler    *commands.Create_promo_handler
+	UpdateHandler    *commands.Update_promo_handler
 }
 
 func NewPromotionService(
@@ -68,6 +69,24 @@ func (s PromotionService) CreatePromo(ctx context.Context, req *pb.CreatePromoRe
 
 	return &pb.CreatePromoResponse{
 		Id:          result.Id,
+		Success:     result.Success,
+		Description: result.Description,
+	}, nil
+}
+
+func (s PromotionService) UpdatePromo(ctx context.Context, req *pb.UpdatePromoRequest) (*pb.UpdatePromoResponse, error) {
+	cmd := &commands.Update_promo_command{
+		Id:    req.Id,
+		Title: req.Title,
+		Value: req.Value,
+	}
+
+	result, err := s.UpdateHandler.Handle(ctx, *cmd)
+
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Internal error: %v", err)
+	}
+	return &pb.UpdatePromoResponse{
 		Success:     result.Success,
 		Description: result.Description,
 	}, nil
