@@ -121,10 +121,50 @@ services:
       retries: 10
       start_period: 30s
 
+  promotion_db_prod:
+    container_name: promotion_db_prod
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456789
+      - MYSQL_DATABASE=promotion_db_prod
+    restart: always
+    ports:
+      - "9303:3306"
+    volumes:
+      - mysql_promotion_prod:/var/lib/mysql
+    networks:
+      - marketplace-prod-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p123456789"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  promotion_api:
+    container_name: promotion-api
+    build:
+      context: .
+      dockerfile: cmd/promotion/Dockerfile
+    ports:
+      - "9203:7003"
+    networks:
+      - marketplace-prod-net
+    environment:
+      - PROMOTION_GRPC_PORT=7003
+      - PROMOTION_DATABASE_URL=root:123456789@tcp(promotion_db_prod:3306)/promotion_db_prod?parseTime=true&multiStatements=true
+      - PROMOTION_MIGRATIONS_PATH=file:///app/migrations/promotion
+    depends_on:
+      promotion_db_prod:
+        condition: service_healthy
+    restart: unless-stopped
+    # no container-level HTTP healthcheck because service is gRPC
+
 volumes:
-    postgres_catalog_prod:
-    postgres_basket_prod:
-    redis_basket_prod:
+  postgres_catalog_prod:
+  postgres_basket_prod:
+  redis_basket_prod:
+  mysql_promotion_prod:
 
 networks: 
   marketplace-prod-net:

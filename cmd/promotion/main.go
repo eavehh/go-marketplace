@@ -17,6 +17,7 @@ import (
 	promotion_grpc "github.com/eavehh/marketpl.microserv/internal/promotion/grpc"
 	pb "github.com/eavehh/marketpl.microserv/internal/promotion/grpc/pb"
 	"github.com/eavehh/marketpl.microserv/internal/promotion/infrastructure/persistence"
+	"github.com/eavehh/marketpl.microserv/internal/shared"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/mysql"
@@ -44,6 +45,10 @@ func main() {
 	db_mig, err := sql.Open("mysql", cfg.Database_url)
 	if err != nil {
 		log.Fatalf("migration_db open: %v", err)
+	}
+
+	if err := shared.Wait_for_db(db_mig, 30, 2*time.Second); err != nil {
+		log.Fatalf("migration_db Wait_for_db: %v", err)
 	}
 
 	if err := run_migrations(db_mig, cfg.Migrations_path); err != nil {
@@ -76,8 +81,8 @@ func open_db(dsn string) (*sql.DB, error) {
 	db.SetConnMaxLifetime(time.Minute * 5)
 	db.SetConnMaxIdleTime(time.Minute * 2)
 
-	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("db.Ping: %w", err)
+	if err := shared.Wait_for_db(db, 30, 2*time.Second); err != nil {
+		return nil, fmt.Errorf("Wait_for_db: %w", err)
 	}
 	return db, nil
 }

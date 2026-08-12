@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/eavehh/marketpl.microserv/internal/basket/application/queries"
 	"github.com/eavehh/marketpl.microserv/internal/basket/infrastructure/cache"
 	"github.com/eavehh/marketpl.microserv/internal/basket/infrastructure/persistence"
+	"github.com/eavehh/marketpl.microserv/internal/promotion/grpc/pb"
 	"github.com/eavehh/marketpl.microserv/internal/shared"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-migrate/migrate/v4"
@@ -21,6 +23,8 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -74,10 +78,33 @@ func main() {
 	pg_repo := persistence.New_cart_repository(db)
 
 	var repo interfaces.Cart_repository = cache.New_redis_cart_repository(
-		pg_repo, 
+		pg_repo,
 		redis_client,
 	)
-	save_cart_handler := commands.New_save_cart_handler(repo)
+
+	promotion_host := os.Getenv("BASKET_PROMOTION_HOST")
+	promotion_port := os.Getenv("BASKET_PROMOTION_PORT")
+
+	promotion_addr := fmt.Sprintf("%s:%s", promotion_host, promotion_port)
+
+	grpc_conn, err := grpc.NewClient(
+		promotion_addr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()), // для снятия протокола шифрования (только для dev)
+	)
+
+	if err != nil {
+		log.Printf("warning: faild to connect to promotion service: %s", promotion_addr)
+	} else {
+		defer grpc_conn.Close()
+		log.Printf("promotin grpc client connected to %s", promotion_addr)
+	}
+
+	var promo_client pb.PromotionServiceClient
+	if grpc_conn != nil {
+		promo_client = pb.NewPromotionServiceClient(grpc_conn)
+	}
+
+	save_cart_handler := commands.New_save_cart_handler(repo, promo_client)
 	get_cart_handler := queries.New_get_cart_handler(repo)
 	delete_cart_handler := commands.New_delete_handler(repo)
 

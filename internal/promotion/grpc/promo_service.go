@@ -109,8 +109,8 @@ func (s PromotionService) DeletePromo(ctx context.Context, req *pb.DeletePromoRe
 	}
 
 	return &pb.DeletePromoResponse{
-		Success:     result,
-		Description: "",
+		Success:     result.Success,
+		Description: result.Description,
 	}, nil
 
 }
