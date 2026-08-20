@@ -61,6 +61,7 @@ func main() {
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		log.Fatal("BASKET: Automigrate: migrate.up error: ", err)
 	}
+	log.Println("migrate applied")
 
 	redis_client := redis.NewClient(&redis.Options{
 		Addr:     redis_url,

@@ -78,11 +78,33 @@ services:
       timeout: 2s
       retries: 10
 
+  checkout_db_dev:
+    container_name: checkout-db-dev
+    image: postgres:18.1
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456789
+      - POSTGRES_DB=checkout-db-dev
+    restart: always
+    ports:
+      - "9104:5432"
+    volumes:
+      - postgres_checkout_dev:/var/lib/postgresql
+    networks:
+      - marketplace-dev-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
 volumes:
     postgres_catalog_dev:
     postgres_basket_dev:
     redis_basket_dev:
     mysql_promotion:
+    postgres_checkout_dev:
 
 networks: 
   marketplace-dev-net:
