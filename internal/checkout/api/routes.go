@@ -11,6 +11,7 @@ func Register_routes(r *gin.Engine, order_handler *handlers.Order_handler) {
 		orders := api.Group("/orders")
 		{
 			orders.GET("/:id", order_handler.Order)
+			orders.GET("user/:account_name", order_handler.Find_by_acc_name)
 		}
 	}
 }

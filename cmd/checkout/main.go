@@ -53,8 +53,11 @@ func main() {
 
 	repo := persistence.New_order_repository(db)
 	order_by_id_handler := queries.New_order_by_id_query_handler(repo)
-
-	order_handler := handlers.New_order_handler(order_by_id_handler)
+	order_by_acc_name_handelr := queries.New_order_by_account_name_handler(repo)
+	order_handler := handlers.New_order_handler(
+		order_by_id_handler,
+		order_by_acc_name_handelr,
+	)
 
 	r := gin.Default()
 	r.Use(shared.Err_handler_middleware())
