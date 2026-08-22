@@ -12,7 +12,7 @@ type Order_handler struct {
 	order_by_id_query_handler queries.Order_by_id_query_handler
 }
 
-func New_order_handle(order_by_id *queries.Order_by_id_query_handler) *Order_handler {
+func New_order_handler(order_by_id *queries.Order_by_id_query_handler) *Order_handler {
 	return &Order_handler{
 		order_by_id_query_handler: *order_by_id,
 	}

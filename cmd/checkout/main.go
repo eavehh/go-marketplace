@@ -5,6 +5,10 @@ import (
 	"log"
 	"os"
 
+	"github.com/eavehh/marketpl.microserv/internal/checkout/api"
+	"github.com/eavehh/marketpl.microserv/internal/checkout/api/handlers"
+	"github.com/eavehh/marketpl.microserv/internal/checkout/application/queries"
+	"github.com/eavehh/marketpl.microserv/internal/checkout/infrastructure/persistence"
 	"github.com/eavehh/marketpl.microserv/internal/shared"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-migrate/migrate/v4"
@@ -47,6 +51,11 @@ func main() {
 	}
 	log.Println("migrate applied")
 
+	repo := persistence.New_order_repository(db)
+	order_by_id_handler := queries.New_order_by_id_query_handler(repo)
+
+	order_handler := handlers.New_order_handler(order_by_id_handler)
+
 	r := gin.Default()
 	r.Use(shared.Err_handler_middleware())
 
@@ -54,7 +63,7 @@ func main() {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
-	// api.Register_routes(r, cart_handler)
+	api.Register_routes(r, order_handler)
 
 	if err := r.Run(":" + app_post); err != nil {
 		log.Fatal(err)
