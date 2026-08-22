@@ -7,11 +7,11 @@ import (
 )
 
 type Order struct {
-	Id               uuid.UUID `json:"id"`
-	Created_by       *string   `json:"created_by,omitempty"`
-	Created_at       time.Time `json:"created_at"`
-	Last_modified_by *string   `json:"last_modified_by,omitempty"`
-	Last_modified_at time.Time `json:"last_modified_at,omitempty"`
+	Id               uuid.UUID  `json:"id"`
+	Created_by       *string    `json:"created_by,omitempty"`
+	Created_at       time.Time  `json:"created_at"`
+	Last_modified_by *string    `json:"last_modified_by,omitempty"`
+	Last_modified_at *time.Time `json:"last_modified_at,omitempty"`
 
 	Account_name           string         `json:"account_name" validate:"required,max=100"`
 	Total_amount           float64        `json:"total_amount"`
@@ -41,7 +41,8 @@ func (o *Order) Set_created_audit(Created_by string) {
 
 func (o *Order) Set_modifies_audit(modified_by string) {
 	o.Last_modified_by = &modified_by
-	o.Last_modified_at = time.Now().UTC()
+	last_modified_at := time.Now().UTC()
+	o.Last_modified_at = &last_modified_at
 }
 
 func (o *Order) Calculate_total_amount() {
@@ -50,5 +51,5 @@ func (o *Order) Calculate_total_amount() {
 	for _, item := range o.Items {
 		total += item.Total()
 	}
-	o.Total_amount = total 
+	o.Total_amount = total
 }
